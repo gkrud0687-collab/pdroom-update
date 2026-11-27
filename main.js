@@ -86,7 +86,10 @@ function createPet() {
   petWin.loadFile('pet.html');
   petWin.once('ready-to-show', () => petWin.showInactive());
   petWin.on('closed', () => { petWin = null; });
-  petWin.webContents.on('did-finish-load', () => { if (idleNow) petWin.webContents.send('idle:changed', true); });
+  petWin.webContents.on('did-finish-load', () => {
+    if (idleNow) petWin.webContents.send('idle:changed', true);
+    if (updateReadyVer) petWin.webContents.send('update:ready', updateReadyVer);
+  });
   // 작업표시줄 아이콘을 눌러 최소화되면 캐릭터는 그대로 두고 설정 창을 열어요
   petWin.on('minimize', () => { setTimeout(() => { if (petWin) { petWin.restore(); petWin.showInactive(); } createSettings(); }, 50); });
   createTray();
@@ -154,6 +157,8 @@ function setConfig(patch) {
 }
 
 let quitting = false;
+let updateReadyVer = null;
+let installUpdateNow = () => quitApp();
 function quitApp() {
   quitting = true;
   // 오버레이가 접속 표시를 지울 시간을 조금 줘요.
@@ -198,6 +203,8 @@ ipcMain.on('win:close', (e) => { const w = BrowserWindow.fromWebContents(e.sende
 ipcMain.on('win:minimize', (e) => { const w = BrowserWindow.fromWebContents(e.sender); if (w) w.minimize(); });
 ipcMain.on('settings:open', () => createSettings());
 ipcMain.on('app:quit', () => quitApp());
+ipcMain.handle('app:version', () => app.getVersion());
+ipcMain.on('update:install', () => installUpdateNow());
 ipcMain.on('setup:done', (_e, data) => {
   setConfig(data);
   if (!petWin) createPet(); else petWin.reload();
@@ -245,8 +252,14 @@ function startAutoUpdate() {
   autoUpdater.on('update-downloaded', (i) => {
     log('downloaded ' + i.version);
     if (tray) tray.setToolTip(`우가우가 — 새 버전 ${i.version} 준비됨 (다음에 켜면 바뀌어요)`);
+    updateReadyVer = i.version;
     if (petWin) petWin.webContents.send('update:ready', i.version);
   });
+  installUpdateNow = () => {
+    quitting = true;
+    if (petWin) petWin.webContents.send('app:leaving');
+    setTimeout(() => { try { autoUpdater.quitAndInstall(true, true); } catch (e) { log('install ' + e.message); app.quit(); } }, 600);
+  };
   const check = () => autoUpdater.checkForUpdates().catch((e) => log('check ' + (e && e.message)));
   setTimeout(check, 15000);
   setInterval(check, 2 * 60 * 60 * 1000);

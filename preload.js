@@ -20,5 +20,7 @@ contextBridge.exposeInMainWorld('api', {
   log: (msg) => ipcRenderer.send('app:log', String(msg).slice(0, 2000)),
   onLeaving: (fn) => ipcRenderer.on('app:leaving', () => fn()),
   onIdle: (fn) => ipcRenderer.on('idle:changed', (_e, v) => fn(v)),
+  installUpdate: () => ipcRenderer.send('update:install'),
+  appVersion: () => ipcRenderer.invoke('app:version'),
   onUpdateReady: (fn) => ipcRenderer.on('update:ready', (_e, v) => fn(v)),
 });

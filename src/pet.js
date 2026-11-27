@@ -1061,6 +1061,7 @@ async function main() {
   play('window_open', 0.5);
   setTimeout(() => { const me = pets.get(myUid); if (me) voice(me.charId, 'default', 0.7); }, 600);
   requestAnimationFrame(loop);
+  setTimeout(showUpdatedOnce, 1500);
 
   // 날짜가 바뀌면 기분 말풍선을 정리해요
   let lastDay = dayKey();
@@ -1076,7 +1077,37 @@ window.api.onConfig(async (c) => {
   else if (!wasDnd && c.dnd) toast('🔕 방해금지: 던지기는 막고, 쪽지는 모아 둘게요');
   syncPets();
 });
-window.api.onUpdateReady((v) => toast(`🎁 새 버전 ${v}을 받아 두었어요. 다음에 켜면 바뀌어요!`, null, 8000));
+// 업데이트 알림: 누를 때까지 화면 가운데에 남아 있어요
+let updateCard = null;
+function showUpdateReady(v) {
+  if (updateCard) return;
+  const later = el('button', {}, '나중에');
+  const now = el('button', { class: 'primary' }, '🔄 지금 다시 켜기');
+  const { wrap } = megaSheet(
+    [el('div', { class: 'mtxt' }, `🎁 새 버전 v${v}이 왔어요!`), el('div', { class: 'msub' }, '지금 다시 켜면 바로 바뀌어요.\n나중에 눌러도 다음에 켤 때 바뀌어요.')],
+    [el('span', { class: 'mlbl' }, '🎁 우가우가 업데이트'), later, now]);
+  updateCard = wrap;
+  later.addEventListener('click', () => { crumple(wrap, 0); updateCard = null; });
+  now.addEventListener('click', () => { now.disabled = true; now.textContent = '다시 켜는 중…'; window.api.installUpdate(); });
+}
+window.api.onUpdateReady((v) => showUpdateReady(v));
+// 업데이트하고 처음 켰을 때 한 번 알려 줘요
+async function showUpdatedOnce() {
+  try {
+    const v = await window.api.appVersion();
+    const last = config.lastVersion;
+    if (last !== v) {
+      await window.api.setConfig({ lastVersion: v });
+      if (last || config.uid) {
+        const { wrap, sheet } = megaSheet(
+          [el('div', { class: 'mtxt' }, `🎉 우가우가 v${v}로\n업데이트됐어요!`)],
+          [el('span', { class: 'mlbl' }, '🎉 업데이트 완료 · 클릭하면 닫혀요')]);
+        wrap.addEventListener('click', () => crumple(wrap, 0));
+        void sheet;
+      }
+    }
+  } catch (e) { console.warn(e); }
+}
 window.api.onIdle((v) => {
   myAway = !!v;
   if (myConn) update(myConn, { away: myAway }).catch(() => {});
@@ -1087,4 +1118,4 @@ window.api.onLeaving(async () => { leaving = true; await stopPresence(); });
 main().catch((e) => { console.error(e); toast(friendlyError(e), null, 20000); });
 
 // 개발용 훅 (화면 점검)
-window.__pdroom = { setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
+window.__pdroom = { showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
