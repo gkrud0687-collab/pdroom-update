@@ -233,6 +233,8 @@ function openMyMenu(pet) {
       btn('⚙️', '설정', () => { closeMenus(); window.api.openSettings(); }),
     ),
     el('div', { class: 'grid one' },
+      btn('🗂️', `보관함 (${(config.archive || []).length})`, () => openArchive())),
+    el('div', { class: 'grid one', style: { marginTop: '6px' } },
       btn(config.freeze ? '🏃' : '🧊', config.freeze ? '다시 움직이기' : '그대로 멈춰라', () => {
         closeMenus(); const v = !config.freeze; window.api.setConfig({ freeze: v });
         toast(v ? '🧊 그대로 멈춰라! 모두 제자리에 서 있어요' : '🏃 다시 돌아다녀요');
@@ -414,10 +416,17 @@ async function sendMega(text, re) {
   return true;
 }
 // 받은 확성기: 화면 가운데에 바로 떠요. 종이를 누르면 닫히고, [답장]을 누르면 바로 써요.
+function megaShownNow() { return openPops.some((p) => p.isConnected && p.classList.contains('mwrap') && p.dataset.kind === 'note'); }
 function megaArrived(id, data) {
-  const n = { id, data, el: null, lx: W / 2 };
+  const n = { id, data, el: null, lx: W / 2, opened: false, arrived: true };
   notes.set(id, n);
   play('note_arrive', 0.9);
+  if (megaShownNow()) { refreshDock(); bumpDock('mega'); return; }   // 이미 한 장 떠 있으면 📢 아이콘 숫자만 올라가요
+  showMega(n);
+}
+function showMega(n) {
+  const { id, data } = n;
+  n.opened = true; refreshDock();
   const c = charById(data.char);
   const txt = el('div', { class: 'mtxt', text: data.text || '' });
   const re = data.re ? el('div', { class: 'mre', text: `↩ ${data.re}` }) : null;
@@ -791,27 +800,111 @@ function landingSpot() {
   }
   return x;
 }
+// ---------------------------------------------------------------- 안 읽은 쪽지·확성기 아이콘 (종류별 1개 + 숫자)
+const dock = { note: null, mega: null };
+function dockPos(kind) { return { x: W - (kind === 'note' ? 70 : 160), y: GROUND - 92 }; }
+function unread(kind) {
+  return [...notes.values()].filter((n) => n.arrived && !n.opened && (kind === 'mega' ? !!n.data.mega : !n.data.mega))
+    .sort((a, b) => (b.data.ts || 0) - (a.data.ts || 0));
+}
+function refreshDock() {
+  for (const kind of ['note', 'mega']) {
+    const list = unread(kind);
+    if (!list.length) { if (dock[kind]) { dock[kind].remove(); dock[kind] = null; } continue; }
+    if (!dock[kind]) {
+      const icon = kind === 'note' ? el('img', { class: 'p', src: 'assets/props/plane_01.png', draggable: 'false' }) : el('div', { class: 'mg', text: '📢' });
+      dock[kind] = el('div', { class: `dockbtn hit ${kind}` }, icon, el('img', { class: 'face', draggable: 'false' }), el('div', { class: 'cnt' }), el('div', { class: 'lb', text: kind === 'note' ? '쪽지' : '확성기' }));
+      dock[kind].addEventListener('click', () => openInboxList(kind));
+      stage.append(dock[kind]);
+    }
+    const d = dockPos(kind);
+    dock[kind].style.left = d.x + 'px'; dock[kind].style.top = d.y + 'px';
+    dock[kind].querySelector('.cnt').textContent = String(list.length);
+    dock[kind].querySelector('.face').src = `assets/${charById(list[0].data.char).face}`;
+    dock[kind].title = `${kind === 'note' ? '안 읽은 쪽지' : '안 읽은 확성기'} ${list.length}개`;
+  }
+}
+function bumpDock(kind) { const b = dock[kind]; if (!b) return; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+function openInboxList(kind) {
+  closeMenus();
+  const list = unread(kind);
+  if (!list.length) return;
+  if (list.length === 1) { kind === 'note' ? openNote(list[0]) : showMega(list[0]); return; }   // 하나뿐이면 바로 열어요
+  play('window_open', 0.35);
+  const rows = list.map((n) => {
+    const c = charById(n.data.char);
+    const t = n.data.ts ? new Date(n.data.ts - 0).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+    const row = el('button', { class: 'irow' }, el('img', { src: `assets/${c.face}` }),
+      el('div', { class: 'it' }, el('div', { class: 'in' }, el('b', { text: n.data.name || '친구' }), el('span', { text: t })),
+        el('div', { class: 'ip', text: (n.data.text || '').replace(/\s+/g, ' ').slice(0, 40) })));
+    row.addEventListener('click', () => { closeMenus(); kind === 'note' ? openNote(n) : showMega(n); });
+    return row;
+  });
+  const pop = el('div', { class: 'pop hit inbox', 'data-kind': 'menu' },
+    el('div', { class: 'ih', text: `${kind === 'note' ? '✈️ 안 읽은 쪽지' : '📢 안 읽은 확성기'} ${list.length}개` }), el('div', { class: 'ilist' }, ...rows));
+  const d = dockPos(kind);
+  placePop(pop, d.x + 40, d.y - 8);
+}
+
+// ---------------------------------------------------------------- 보관함 (받은 쪽지·확성기, 이 PC에 최대 20개)
+const ARCHIVE_MAX = 20;
+function archiveAdd(id, data) {
+  if (!data || data.from === myUid) return;                 // 내가 보낸 건 저장하지 않아요
+  const list = Array.isArray(config.archive) ? config.archive.slice() : [];
+  if (list.some((a) => a.id === id)) return;
+  list.unshift({ id, kind: data.mega ? 'mega' : 'note', name: data.name || '친구', char: data.char || '', text: String(data.text || '').slice(0, 300), re: data.re || null, ts: Number(data.ts) || Date.now() });
+  list.sort((a, b) => b.ts - a.ts);
+  config.archive = list.slice(0, ARCHIVE_MAX);              // 20개가 넘으면 가장 오래된 것부터 지워요
+  window.api.setConfig({ archive: config.archive });
+}
+function openArchive() {
+  closeMenus();
+  const list = Array.isArray(config.archive) ? config.archive : [];
+  play('window_open', 0.35);
+  const rows = list.map((a) => {
+    const c = charById(a.char);
+    const t = new Date(a.ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const row = el('button', { class: 'irow' }, el('img', { src: `assets/${c.face}` }),
+      el('div', { class: 'it' }, el('div', { class: 'in' }, el('b', { text: `${a.kind === 'mega' ? '📢' : '✈️'} ${a.name}` }), el('span', { text: t })),
+        el('div', { class: 'ip', text: a.text.replace(/\s+/g, ' ').slice(0, 40) })));
+    row.addEventListener('click', () => { closeMenus(); openArchived(a); });
+    return row;
+  });
+  const me = pets.get(myUid);
+  const pop = el('div', { class: 'pop hit inbox', 'data-kind': 'menu' },
+    el('div', { class: 'ih', text: `🗂️ 보관함 ${list.length}/${ARCHIVE_MAX}` }),
+    el('div', { class: 'isub', text: '받은 쪽지·확성기만 모여요. 20개가 넘으면 오래된 것부터 지워져요.' }),
+    list.length ? el('div', { class: 'ilist' }, ...rows) : el('div', { class: 'ip', text: '아직 받은 게 없어요.' }));
+  placePop(pop, me ? me.x : W / 2, me ? me.headTop() - 56 : GROUND - 100);
+}
+function openArchived(a) {
+  play('note_open', 0.7);
+  const c = charById(a.char);
+  const t = new Date(a.ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const del = el('button', {}, '🗑️ 지우기');
+  const close = el('button', { class: 'primary' }, '닫기');
+  const card = centerCard([
+    el('div', { class: 'hd' }, el('img', { src: `assets/${c.face}` }), el('b', { text: `${a.kind === 'mega' ? '📢 ' : ''}${a.name}의 ${a.kind === 'mega' ? '확성기' : '쪽지'}` }), el('span', { class: 't', text: `🗂️ 보관함 · ${t}` })),
+    a.re ? el('div', { class: 're', text: `↩ ${a.re}` }) : null,
+    el('div', { class: 'txt', text: a.text }),
+    el('div', { class: 'ft' }, del, close)].filter(Boolean));
+  card.classList.remove('boom');
+  close.onclick = () => { card.remove(); openPops = openPops.filter((p) => p !== card); };
+  del.onclick = () => { config.archive = (config.archive || []).filter((x) => x.id !== a.id); window.api.setConfig({ archive: config.archive }); close.onclick(); toast('보관함에서 지웠어요'); };
+}
+
 function noteArrived(id, data, fresh) {
   if (notes.has(id)) return;
+  archiveAdd(id, data);
   if (data.mega) { megaArrived(id, data); return; }
-  const n = { id, data, el: null, lx: 0 };
+  const n = { id, data, el: null, lx: 0, opened: false, arrived: false };
   notes.set(id, n);
-  const x = landingSpot(); n.lx = x;
-  const land = () => {
-    if (!notes.has(id)) return;
-    const c = charById(data.char);
-    n.el = el('div', { class: 'landed hit', title: `${data.name || '친구'}의 쪽지`, style: { left: x + 'px', top: (GROUND - 74) + 'px' } },
-      el('img', { class: 'p', src: 'assets/props/plane_01.png', draggable: 'false' }),
-      el('img', { class: 'face', src: `assets/${c.face}`, draggable: 'false' }),
-      el('div', { class: 'dot', text: '!' }));
-    n.el.addEventListener('click', () => openNote(n));
-    stage.append(n.el);
-    play('note_arrive', 0.8);
-  };
+  const land = () => { if (!notes.has(id)) return; n.arrived = true; refreshDock(); play('note_arrive', 0.8); bumpDock('note'); };
   if (fresh) {
     play('plane_fly', 0.7);
     const fromLeft = Math.random() < 0.5;
-    flyPlane({ x: fromLeft ? -60 : W + 60, y: GROUND - 380 - Math.random() * 150 }, { x, y: GROUND - 40 }, 1700, land);
+    const d = dockPos('note');
+    flyPlane({ x: fromLeft ? -60 : W + 60, y: GROUND - 380 - Math.random() * 150 }, { x: d.x, y: d.y + 30 }, 1700, land);
   } else land();
   const me = pets.get(myUid);
   if (me && !me.busy && fresh) setTimeout(() => me.say(`${data.name || '친구'}에게서 쪽지가 왔어요!`, 2500), 1700);
@@ -819,6 +912,7 @@ function noteArrived(id, data, fresh) {
 function openNote(n) {
   const { data } = n;
   if (n.el) { n.el.remove(); n.el = null; }
+  n.opened = true; refreshDock();
   play('note_open', 0.9);
   const me = pets.get(myUid);
   if (me && !me.hidden) { me.playOnce('read', 2600); voice(me.charId, 'happy', 0.6); }
@@ -863,7 +957,7 @@ function closeAfterReply(card, n, delay = 900) {
   setTimeout(() => {
     card.classList.add('fadeaway');
     setTimeout(() => { card.remove(); openPops = openPops.filter((p) => p !== card); }, 450);
-    if (n) { notes.delete(n.id); remove(R(room, 'notes', myUid, n.id)).catch(() => {}); }
+    if (n) { notes.delete(n.id); remove(R(room, 'notes', myUid, n.id)).catch(() => {}); refreshDock(); }
   }, delay);
 }
 function crumple(card, n) {
@@ -898,6 +992,7 @@ function crumple(card, n) {
   tick();
   notes.delete(n.id);
   remove(R(room, 'notes', myUid, n.id)).catch(() => {});
+  refreshDock();
 }
 function releaseDndQueue() {
   let i = 0;
@@ -1191,4 +1286,4 @@ window.api.onLeaving(async () => { leaving = true; await stopPresence(); });
 main().catch((e) => { console.error(e); toast(friendlyError(e), null, 20000); });
 
 // 개발용 훅 (화면 점검)
-window.__pdroom = { startPiggy, showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
+window.__pdroom = { openArchive, archiveAdd, refreshDock, openInboxList, showMega, startPiggy, showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
