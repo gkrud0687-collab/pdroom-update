@@ -1,6 +1,6 @@
 // 우가우가 — 메인 프로세스
 // 창: 처음 설정(setup), 캐릭터 오버레이(pet), 설정(settings). 트레이 메뉴, 로컬 설정 파일, 자동 실행.
-const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, powerMonitor, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -270,6 +270,27 @@ function startAutoUpdate() {
   setInterval(check, 30 * 60 * 1000); // 30분마다 확인
 }
 
+// 시작 메뉴 바로가기가 없으면 작업표시줄 아이콘이 빈 문서로 보이고 고정도 안 돼요.
+// 다시 설치하다가 바로가기가 지워지는 경우가 있어서, 없으면 앱이 직접 만들어요.
+function ensureShortcuts() {
+  if (process.platform !== 'win32' || !app.isPackaged) return;
+  const link = { target: process.execPath, icon: process.execPath, iconIndex: 0, appUserModelId: 'com.pdroom.app', description: '우가우가' };
+  try {
+    const startDir = path.join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs');
+    const has = ['우가우가.lnk', '피디들 방.lnk', 'PDRoom.lnk'].some((n) => fs.existsSync(path.join(startDir, n)));
+    if (!has) shell.writeShortcutLink(path.join(startDir, '우가우가.lnk'), 'create', link);
+  } catch (e) { try { fs.appendFileSync(path.join(app.getPath('userData'), 'log.txt'), `${new Date().toISOString()} shortcut ${e.message}\n`); } catch { /* */ } }
+  // 바탕화면 바로가기는 한 번만 만들어요 (지우면 다시 안 만들어요)
+  try {
+    if (!config.deskLinkMade) {
+      const desk = app.getPath('desktop');
+      const has = ['우가우가.lnk', '피디들 방.lnk', 'PDRoom.lnk'].some((n) => fs.existsSync(path.join(desk, n)));
+      if (!has) shell.writeShortcutLink(path.join(desk, '우가우가.lnk'), 'create', link);
+      setConfig({ deskLinkMade: true });
+    }
+  } catch { /* 무시 */ }
+}
+
 app.whenReady().then(() => {
   // 작업표시줄 아이콘 오른쪽 클릭 메뉴에 '우가우가 끄기'를 넣어요
   if (process.platform === 'win32' && app.isPackaged) {
@@ -279,6 +300,7 @@ app.whenReady().then(() => {
     } catch { /* 무시 */ }
   }
   loadConfig();
+  ensureShortcuts(); // 반드시 loadConfig 뒤에 (설정을 덮어쓰지 않게)
   const fixedRoom = loadBuildConfig().room;
   if (fixedRoom && config.room !== fixedRoom) { config.room = fixedRoom; config.uid = null; config.char = null; saveConfig(); }
   if (config.room && config.uid && config.char && config.name) createPet();
