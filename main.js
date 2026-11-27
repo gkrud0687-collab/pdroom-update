@@ -82,6 +82,10 @@ function createPet() {
     webPreferences: baseWeb,
   });
   petWin.setAlwaysOnTop(true, 'screen-saver');
+  // 작업표시줄 아이콘이 빈 문서로 보이지 않게, 이 창의 아이콘·앱 정보를 exe 기준으로 직접 알려 줘요
+  if (process.platform === 'win32') {
+    try { petWin.setAppDetails({ appId: 'com.pdroom.app', appIconPath: process.execPath, appIconIndex: 0, relaunchCommand: `"${process.execPath}"`, relaunchDisplayName: '우가우가' }); } catch { /* 무시 */ }
+  }
   petWin.setIgnoreMouseEvents(true, { forward: true });
   petWin.loadFile('pet.html');
   petWin.once('ready-to-show', () => petWin.showInactive());
