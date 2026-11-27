@@ -134,7 +134,7 @@ function createTray() {
   if (tray) { tray.setImage(trayIcon()); tray.setContextMenu(trayMenu()); return; }
   try {
     tray = new Tray(trayIcon());
-    tray.setToolTip('피디들 방');
+    tray.setToolTip('피디들 방 v' + app.getVersion());
     tray.setContextMenu(trayMenu());
     tray.on('click', createSettings);
   } catch (e) { console.error('tray', e); }
