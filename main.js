@@ -263,7 +263,7 @@ function startAutoUpdate() {
   };
   const check = () => autoUpdater.checkForUpdates().catch((e) => log('check ' + (e && e.message)));
   setTimeout(check, 15000);
-  setInterval(check, 2 * 60 * 60 * 1000);
+  setInterval(check, 30 * 60 * 1000); // 30분마다 확인
 }
 
 app.whenReady().then(() => {

@@ -40,7 +40,7 @@
 ## 4-0. 새 버전 내기 (자동 업데이트, 0.3.0부터)
 - 공개 저장소 github.com/gkrud0687-collab/pdroom-update 의 GitHub Actions(`.github/workflows/release.yml`, Windows)가 설치 파일(PDRoom-Setup-x.exe)을 만들어 Releases에 올립니다. 저장소 Secret `BUILD_CONFIG`에 build-config.json 내용이 들어 있어요.
 - 순서: `package.json`의 version 올리기 → main에 push → Actions에서 release 워크플로 실행(Run workflow).
-- 앱은 electron-updater로 15초 뒤·2시간마다 확인 → 받아 두고 "🎁 새 버전" 압정 종이를 띄움(지금 다시 켜기/나중에). 업데이트 후 첫 실행에 "🎉 업데이트됐어요" 1회.
+- 앱은 electron-updater로 15초 뒤·30분마다 확인 → 받아 두고 "🎁 새 버전" 압정 종이를 띄움(지금 다시 켜기/나중에). 업데이트 후 첫 실행에 "🎉 업데이트됐어요" 1회.
 - **appId(com.pdroom.app), productName(PDRoom), 저장 폴더 이름은 바꾸면 안 됩니다.** 바꾸면 자동 업데이트가 끊기고 캐릭터 선택이 처음부터 다시 나와요. 화면에 보이는 이름(우가우가)만 바꿀 수 있어요.
 
 ## 4. 만들기(빌드) 방법 — Windows PC에서
