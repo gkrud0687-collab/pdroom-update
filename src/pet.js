@@ -83,7 +83,16 @@ class Pet {
       const c = this.rideOn;
       if (now >= this.rideUntil || !pets.has(c.uid) || c.held || c.hidden) endPiggy(this);
       else {
-        this.dir = c.dir; this.x = c.x - c.dir * c.facing * D * 0.06; this.y = c.y + D * 0.26; this.set('sit');
+        this.dir = c.dir; this.x = c.x; this.y = c.y; this.set('sit');
+        if (this.bagEl) {
+          const back = -(c.dir * c.facing);                // 친구가 보는 방향의 반대쪽 = 등
+          const bw = D * 0.36, top = GROUND - c.y - FOOT + D * 0.47;
+          this.bagEl.style.width = bw + 'px';
+          this.bagEl.style.left = (c.x + back * D * 0.11 - bw / 2) + 'px';
+          this.bagEl.style.top = top + 'px';
+          this.bagEl.classList.toggle('flip', back < 0);
+          this.bagEl.classList.toggle('bob', c.anim === 'walk');
+        }
         const a0 = this.frames(this.anim); this.ft += dt; const spf0 = 1 / (a0.fps || 2);
         while (this.ft >= spf0) { this.ft -= spf0; if (a0.loop || this.frame < a0.frames.length - 1) this.frame = (this.frame + 1) % a0.frames.length; }
         return;
@@ -119,7 +128,7 @@ class Pet {
   render(hiddenAll) {
     const hide = hiddenAll || this.hidden;
     this.el.classList.toggle('gone', hide);
-    this.tag.style.display = hide || this.carrying ? 'none' : '';   // 업고 있을 땐 이름표가 등에 탄 친구를 가려서 숨겨요
+    this.tag.style.display = hide || this.rideOn ? 'none' : '';   // 가방에 들어가 있을 땐 이름표를 숨겨요
     if (this.bubble) this.bubble.style.display = hide ? 'none' : '';
     if (hide) return;
     const a = this.frames(this.anim);
@@ -513,7 +522,13 @@ function startPiggy(rider, carrier) {
   voice(rider.charId, 'happy', 0.8);
   rider.held = false; rider.falling = false; rider.until = 0; rider.targetX = null;
   rider.rideOn = carrier; rider.rideUntil = performance.now() + PIGGY_MS;
-  rider.el.classList.add('riding');
+  // 친구 등의 가방에 쏙 들어가서 얼굴만 내밀어요
+  rider.el.classList.add('inbag');
+  rider.bagEl = el('div', { class: 'bagride' },
+    el('img', { class: 'bface', src: `assets/props/bagface_${rider.charId}.png`, draggable: 'false' }),
+    el('img', { class: 'bbag', src: 'assets/props/piggy_bag.png', draggable: 'false' }));
+  stage.append(rider.bagEl);
+  play('note_arrive', 0.6);
   carrier.carrying = rider;
   carrier.say('끙차… 무거워!', 2200);
   voice(carrier.charId, 'sigh', 0.7);
@@ -524,7 +539,8 @@ function startPiggy(rider, carrier) {
 }
 function endPiggy(rider) {
   const carrier = rider.rideOn;
-  rider.rideOn = null; rider.el.classList.remove('riding');
+  rider.rideOn = null; rider.el.classList.remove('inbag');
+  if (rider.bagEl) { rider.bagEl.remove(); rider.bagEl = null; }
   if (carrier) carrier.carrying = null;
   rider.x = Math.max(D / 2, Math.min(W - D / 2, rider.x + (carrier ? -carrier.dir * 40 : 0)));
   rider.falling = true; rider.vy = 260; rider.set('held');
