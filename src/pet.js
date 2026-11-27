@@ -265,7 +265,7 @@ function openFriendMenu(pet) {
       btn('🪶', '간지럼', () => { closeMenus(); requestPrank(pet.uid, 'tickle'); }, { disabled: dnd }),
       btn('🍌', '바나나', () => { closeMenus(); requestBanana(pet.uid); }, { disabled: dnd }),
       btn('🏷️', '이름표', () => { closeMenus(); openNameTag(pet); }, { disabled: dnd }),
-      btn('🐨', '업히기', () => { closeMenus(); requestPrank(pet.uid, 'piggy'); }, { disabled: dnd }),
+      PIGGY_ON ? btn('🐨', '업히기', () => { closeMenus(); requestPrank(pet.uid, 'piggy'); }, { disabled: dnd }) : null,
     ),
     el('div', { class: 'grid one' }, btn('✉️', '쪽지', () => { closeMenus(); openCompose(pet.uid); })),
     dnd ? el('div', { class: 'note', text: '🔕 방해금지 중이에요. 쪽지는 끝나면 도착해요.' }) : null);
@@ -526,6 +526,8 @@ function animatePrank(fromUid, toUid, kind) {
 }
 // 업히기: 장난 건 캐릭터가 친구 등에 올라타서 6초 동안 같이 다녀요
 const PIGGY_MS = 6000;
+// 업히기는 '완전 옆모습' 업은 캐릭터 그림(carry_stand/carry_walk)이 오면 켜요
+var PIGGY_ON = false;
 function startPiggy(rider, carrier) {
   if (rider.rideOn) return;
   voice(rider.charId, 'happy', 0.8);
