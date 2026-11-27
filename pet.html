@@ -192,6 +192,8 @@
   .bagride .bface { position: absolute; left: 12%; width: 82%; bottom: 46%; }
   .bagride .bbag { position: absolute; left: 0; top: 0; width: 100%; }
   .bagride.flip { transform: scaleX(-1); }
+  .pet img.carrywob { animation: carrywob .5s ease-in-out infinite alternate; transform-origin: 50% 88%; }
+  @keyframes carrywob { from { rotate: -3deg; translate: 0 0; } to { rotate: 3deg; translate: 0 -3px; } }
   .bagride.bob { animation: bagbob .5s ease-in-out infinite alternate; }
   @keyframes bagbob { from { translate: 0 0; } to { translate: 0 -4px; } }
   .msub { text-align: center; font-size: 13.5px; color: #6b5040; line-height: 1.5; white-space: pre-wrap; word-break: keep-all; }

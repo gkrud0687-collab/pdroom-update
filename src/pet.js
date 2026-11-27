@@ -46,6 +46,8 @@ class Pet {
   get isMe() { return this.uid === myUid; }
   get busy() { return this.until > performance.now() || this.held || this.falling; }
   frames(name) {
+    // 친구를 업고 있을 땐 완전 옆모습 + 어질어질(@_@) 얼굴
+    if (this.carrying) return { frames: [`props/carry_side_${this.charId}_dizzy.png`], fps: 2, loop: true };
     if (name === 'hitPoop') { // 똥 맞으면 찡그린 얼굴(맞음2)을 계속 보여 줘요
       const h = this.c.anims.hitCan; return { frames: [h.frames[Math.min(1, h.frames.length - 1)]], fps: 5, loop: false };
     }
@@ -85,10 +87,10 @@ class Pet {
       else {
         this.dir = c.dir; this.x = c.x; this.y = c.y; this.set('sit');
         if (this.bagEl) {
-          const back = -(c.dir * c.facing);                // 친구가 보는 방향의 반대쪽 = 등
-          const bw = D * 0.36, top = GROUND - c.y - FOOT + D * 0.47;
+          const back = -c.dir;                             // 업은 친구 옆모습은 dir 쪽을 봐요. 반대쪽 = 등
+          const bw = D * 0.36, top = GROUND - c.y - FOOT + D * BAG_Y;
           this.bagEl.style.width = bw + 'px';
-          this.bagEl.style.left = (c.x + back * D * 0.11 - bw / 2) + 'px';
+          this.bagEl.style.left = (c.x + back * D * BAG_X - bw / 2) + 'px';
           this.bagEl.style.top = top + 'px';
           this.bagEl.classList.toggle('flip', back > 0);   // 옆모습 그림은 오른쪽을 봐요. 업은 친구와 같은 쪽을 보게 뒤집어요
           this.bagEl.classList.toggle('bob', c.anim === 'walk');
@@ -136,7 +138,9 @@ class Pet {
     if (this.img.dataset.src !== src) { this.img.src = src; this.img.dataset.src = src; }
     const left = this.x - D / 2, top = GROUND - this.y - FOOT;
     this.el.style.transform = `translate(${left}px, ${top}px)`;
-    this.img.style.transform = this.dir * this.facing < 0 ? 'scaleX(-1)' : '';
+    // 업은 옆모습 그림은 오른쪽을 봐요
+    this.img.style.transform = (this.carrying ? this.dir < 0 : this.dir * this.facing < 0) ? 'scaleX(-1)' : '';
+    this.img.classList.toggle('carrywob', !!this.carrying && this.anim === 'walk');
     this.tag.style.left = this.x + 'px';
     this.tag.style.top = (this.headTop() - 2) + 'px';
     if (this.bubble) { this.bubble.style.left = this.x + 'px'; this.bubble.style.top = this.headTop() - 30 + 'px'; }
@@ -526,8 +530,9 @@ function animatePrank(fromUid, toUid, kind) {
 }
 // 업히기: 장난 건 캐릭터가 친구 등에 올라타서 6초 동안 같이 다녀요
 const PIGGY_MS = 6000;
+const BAG_X = 0.14, BAG_Y = 0.49;   // 가방 자리 (등 쪽으로 얼마나, 위에서 얼마나)
 // 업히기는 '완전 옆모습' 업은 캐릭터 그림(carry_stand/carry_walk)이 오면 켜요
-var PIGGY_ON = false;
+var PIGGY_ON = true;
 function startPiggy(rider, carrier) {
   if (rider.rideOn) return;
   voice(rider.charId, 'happy', 0.8);
@@ -536,7 +541,7 @@ function startPiggy(rider, carrier) {
   // 친구 등의 가방에 쏙 들어가서 얼굴만 내밀어요
   rider.el.classList.add('inbag');
   rider.bagEl = el('div', { class: 'bagride' },
-    el('img', { class: 'bface', src: `assets/props/bagside_${rider.charId}.png`, draggable: 'false' }),
+    el('img', { class: 'bface', src: `assets/props/bagside_${rider.charId}_happy.png`, draggable: 'false' }),
     el('img', { class: 'bbag', src: 'assets/props/piggy_bag_side.png', draggable: 'false' }));
   stage.append(rider.bagEl);
   play('note_arrive', 0.6);
