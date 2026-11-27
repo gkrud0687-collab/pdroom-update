@@ -136,6 +136,7 @@ function trayMenu() {
     { label: '모든 캐릭터 숨기기', type: 'checkbox', checked: !!hide.all, click: (i) => setConfig({ hide: { ...(config.hide || {}), all: i.checked } }) },
     { label: '소리', type: 'checkbox', checked: config.sound?.on !== false, click: (i) => setConfig({ sound: { ...(config.sound || {}), on: i.checked } }) },
     { type: 'separator' },
+    { label: '업데이트 확인', click: () => manualCheck() },
     { label: '설정', click: createSettings },
     { label: '종료', click: quitApp },
   ]);
@@ -164,6 +165,9 @@ function setConfig(patch) {
 let quitting = false;
 let updateReadyVer = null;
 let installUpdateNow = () => quitApp();
+// '업데이트 확인'을 눌렀을 때: 결과를 화면 위 알림으로 보여 줘요
+const updStatus = (state, v) => { if (petWin) petWin.webContents.send('update:status', { state, v: v || app.getVersion() }); };
+let manualCheck = () => updStatus(app.isPackaged ? 'error' : 'dev');
 function quitApp() {
   quitting = true;
   // 오버레이가 접속 표시를 지울 시간을 조금 줘요.
@@ -240,6 +244,7 @@ function snapIfAsked(win, name) {
 
 app.on('second-instance', (_e, argv) => {
   if ((argv || []).includes('--quit')) { quitApp(); return; }
+  if ((argv || []).includes('--check-update')) { manualCheck(); return; }
   if (setupWin) setupWin.focus(); else createSettings();
 });
 app.on('window-all-closed', () => { if (quitting || (!petWin && !setupWin)) app.quit(); });
@@ -266,6 +271,18 @@ function startAutoUpdate() {
     setTimeout(() => { try { autoUpdater.quitAndInstall(true, true); } catch (e) { log('install ' + e.message); app.quit(); } }, 600);
   };
   const check = () => autoUpdater.checkForUpdates().catch((e) => log('check ' + (e && e.message)));
+  let checking = false;
+  manualCheck = () => {
+    if (updateReadyVer) { if (petWin) petWin.webContents.send('update:ready', updateReadyVer); return; }
+    if (checking) { updStatus('checking'); return; }
+    checking = true; updStatus('checking');
+    autoUpdater.checkForUpdates().then((r) => {
+      const v = r && r.updateInfo && r.updateInfo.version;
+      if (r && r.isUpdateAvailable === false) updStatus('latest');
+      else if (v && v !== app.getVersion()) updStatus('downloading', v);  // 다 받으면 '새 버전 왔어요' 카드가 떠요
+      else updStatus('latest');
+    }).catch((e) => { log('manual ' + (e && e.message)); updStatus('error'); }).finally(() => { checking = false; });
+  };
   setTimeout(check, 15000);
   setInterval(check, 30 * 60 * 1000); // 30분마다 확인
 }
@@ -295,8 +312,11 @@ app.whenReady().then(() => {
   // 작업표시줄 아이콘 오른쪽 클릭 메뉴에 '우가우가 끄기'를 넣어요
   if (process.platform === 'win32' && app.isPackaged) {
     try {
-      app.setUserTasks([{ program: process.execPath, arguments: '--quit', iconPath: process.execPath, iconIndex: 0,
-        title: '우가우가 끄기', description: '우가우가를 완전히 꺼요' }]);
+      app.setUserTasks([
+        { program: process.execPath, arguments: '--check-update', iconPath: process.execPath, iconIndex: 0,
+          title: '업데이트 확인', description: '새 버전이 있는지 바로 확인해요' },
+        { program: process.execPath, arguments: '--quit', iconPath: process.execPath, iconIndex: 0,
+          title: '우가우가 끄기', description: '우가우가를 완전히 꺼요' }]);
     } catch { /* 무시 */ }
   }
   loadConfig();

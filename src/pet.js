@@ -1266,6 +1266,18 @@ function showUpdateReady(v) {
   now.addEventListener('click', () => { now.disabled = true; now.textContent = '다시 켜는 중…'; window.api.installUpdate(); });
 }
 window.api.onUpdateReady((v) => showUpdateReady(v));
+// '업데이트 확인' 결과
+function showUpdateStatus(d) {
+  const t = {
+    checking: ['🔍 새 버전이 있는지 확인하는 중이에요…', 2500],
+    latest: [`✅ 지금이 최신 버전이에요 (v${d.v})`, 4200],
+    downloading: [`🎁 새 버전 v${d.v}을 받는 중이에요. 다 받으면 알려 드릴게요!`, 6000],
+    error: ['😢 확인하지 못했어요. 인터넷 연결을 보고 잠시 뒤에 다시 눌러 주세요.', 6000],
+    dev: ['(시험용 실행이라 업데이트 확인은 설치한 앱에서만 돼요)', 3000],
+  }[d.state];
+  if (t) toast(t[0], null, t[1]);
+}
+if (window.api.onUpdateStatus) window.api.onUpdateStatus((d) => showUpdateStatus(d));
 // 업데이트하고 처음 켰을 때 한 번 알려 줘요
 async function showUpdatedOnce() {
   try {
@@ -1293,4 +1305,4 @@ window.api.onLeaving(async () => { leaving = true; await stopPresence(); });
 main().catch((e) => { console.error(e); toast(friendlyError(e), null, 20000); });
 
 // 개발용 훅 (화면 점검)
-window.__pdroom = { openArchive, archiveAdd, refreshDock, openInboxList, showMega, startPiggy, showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
+window.__pdroom = { openArchive, archiveAdd, refreshDock, openInboxList, showMega, startPiggy, showUpdateReady, showUpdateStatus, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
