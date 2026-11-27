@@ -1,4 +1,4 @@
-// 피디들 방 — 메인 프로세스
+// 우가우가 — 메인 프로세스
 // 창: 처음 설정(setup), 캐릭터 오버레이(pet), 설정(settings). 트레이 메뉴, 로컬 설정 파일, 자동 실행.
 const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, powerMonitor } = require('electron');
 const path = require('path');
@@ -62,7 +62,7 @@ function createSetup() {
   if (setupWin) { setupWin.show(); setupWin.focus(); return; }
   setupWin = new BrowserWindow({
     width: 640, height: 500, resizable: false, frame: false, transparent: true, show: false,
-    title: '피디들 방', icon: winIcon(), webPreferences: baseWeb,
+    title: '우가우가', icon: winIcon(), webPreferences: baseWeb,
   });
   setupWin.loadFile('setup.html');
   setupWin.once('ready-to-show', () => setupWin.show());
@@ -76,7 +76,7 @@ function createPet() {
     // 작업표시줄을 가리지 않게 workArea만 덮고, 작업표시줄에는 프로그램 아이콘이 보이게 해요
     x: d.workArea.x, y: d.workArea.y, width: d.workArea.width, height: d.workArea.height,
     frame: false, transparent: true, resizable: false, movable: false, skipTaskbar: false,
-    hasShadow: false, focusable: true, show: false, title: '피디들 방', icon: winIcon(),
+    hasShadow: false, focusable: true, show: false, title: '우가우가', icon: winIcon(),
     webPreferences: baseWeb,
   });
   petWin.setAlwaysOnTop(true, 'screen-saver');
@@ -104,7 +104,7 @@ function createSettings() {
   if (settingsWin) { settingsWin.show(); settingsWin.focus(); return; }
   settingsWin = new BrowserWindow({
     width: 400, height: 720, resizable: false, frame: false, transparent: true, show: false,
-    alwaysOnTop: true, title: '피디들 방 설정', icon: winIcon(), webPreferences: baseWeb,
+    alwaysOnTop: true, title: '우가우가 설정', icon: winIcon(), webPreferences: baseWeb,
   });
   settingsWin.loadFile('settings.html');
   settingsWin.once('ready-to-show', () => settingsWin.show());
@@ -119,7 +119,7 @@ function trayIcon() {
 function trayMenu() {
   const hide = config.hide || {};
   return Menu.buildFromTemplate([
-    { label: '피디들 방', enabled: false },
+    { label: '우가우가', enabled: false },
     { type: 'separator' },
     { label: '방해금지', type: 'checkbox', checked: !!config.dnd, click: (i) => setConfig({ dnd: i.checked }) },
     { label: '내 캐릭터 숨기기', type: 'checkbox', checked: !!hide.mine, click: (i) => setConfig({ hide: { ...(config.hide || {}), mine: i.checked } }) },
@@ -134,7 +134,7 @@ function createTray() {
   if (tray) { tray.setImage(trayIcon()); tray.setContextMenu(trayMenu()); return; }
   try {
     tray = new Tray(trayIcon());
-    tray.setToolTip('피디들 방 v' + app.getVersion());
+    tray.setToolTip('우가우가 v' + app.getVersion());
     tray.setContextMenu(trayMenu());
     tray.on('click', createSettings);
   } catch (e) { console.error('tray', e); }
@@ -239,7 +239,7 @@ function startAutoUpdate() {
   autoUpdater.on('update-available', (i) => log('available ' + i.version));
   autoUpdater.on('update-downloaded', (i) => {
     log('downloaded ' + i.version);
-    if (tray) tray.setToolTip(`피디들 방 — 새 버전 ${i.version} 준비됨 (다음에 켜면 바뀌어요)`);
+    if (tray) tray.setToolTip(`우가우가 — 새 버전 ${i.version} 준비됨 (다음에 켜면 바뀌어요)`);
     if (petWin) petWin.webContents.send('update:ready', i.version);
   });
   const check = () => autoUpdater.checkForUpdates().catch((e) => log('check ' + (e && e.message)));

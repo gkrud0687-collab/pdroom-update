@@ -20,7 +20,7 @@ module.exports = async function afterPack(ctx) {
     const [a, b, c] = version.split('.').map(Number);
     vi.setFileVersion(a, b, c, 0); vi.setProductVersion(a, b, c, 0);
     vi.setStringValues({ lang: 1033, codepage: 1200 }, {
-      FileDescription: '피디들 방', ProductName: '피디들 방', CompanyName: '피디들 방',
+      FileDescription: '우가우가', ProductName: '우가우가', CompanyName: '우가우가',
       OriginalFilename: 'PDRoom.exe', InternalName: 'PDRoom', LegalCopyright: '',
     });
     vi.outputToResourceEntries(res.entries);

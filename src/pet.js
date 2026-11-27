@@ -1,4 +1,4 @@
-// 피디들 방 — 바탕화면 오버레이
+// 우가우가 — 바탕화면 오버레이
 // 캐릭터 돌아다니기, 기분 말풍선, 던지기, 종이비행기 쪽지, 포춘쿠키, 똥싸기·배부름·인생무상
 import {
   ref, get, set, update, remove, push, onValue, onChildAdded, onChildRemoved, onDisconnect,
