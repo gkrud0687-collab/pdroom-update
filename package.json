@@ -57,7 +57,7 @@
       "oneClick": true,
       "perMachine": false,
       "allowToChangeInstallationDirectory": false,
-      "createDesktopShortcut": true,
+      "createDesktopShortcut": "always",
       "createStartMenuShortcut": true,
       "shortcutName": "우가우가",
       "artifactName": "PDRoom-Setup-${version}.${ext}",
