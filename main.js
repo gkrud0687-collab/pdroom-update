@@ -127,6 +127,7 @@ function trayMenu() {
     { label: '우가우가', enabled: false },
     { type: 'separator' },
     { label: '방해금지', type: 'checkbox', checked: !!config.dnd, click: (i) => setConfig({ dnd: i.checked }) },
+    { label: '그대로 멈춰라', type: 'checkbox', checked: !!config.freeze, click: (i) => setConfig({ freeze: i.checked }) },
     { label: '내 캐릭터 숨기기', type: 'checkbox', checked: !!hide.mine, click: (i) => setConfig({ hide: { ...(config.hide || {}), mine: i.checked } }) },
     { label: '모든 캐릭터 숨기기', type: 'checkbox', checked: !!hide.all, click: (i) => setConfig({ hide: { ...(config.hide || {}), all: i.checked } }) },
     { label: '소리', type: 'checkbox', checked: config.sound?.on !== false, click: (i) => setConfig({ sound: { ...(config.sound || {}), on: i.checked } }) },

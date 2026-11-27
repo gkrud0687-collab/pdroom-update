@@ -87,6 +87,9 @@ class Pet {
       if (now >= this.until) { this.until = 0; const f = this.onEnd; this.onEnd = null; this.set('idle'); this.nextDecide = now + 1500; if (f) f(); }
     } else if (this.away) {
       this.targetX = null; this.set('rest'); this.nextDecide = now + 1500;
+    } else if (config.freeze) {
+      // 그대로 멈춰라: 내 화면의 모든 캐릭터가 제자리에 가만히 서 있어요 (맞기·장난 반응은 그대로)
+      this.targetX = null; this.set('idle'); this.nextDecide = now + 1500;
     } else if (this.targetX != null) {
       const d = this.targetX - this.x;
       this.dir = d >= 0 ? 1 : -1;
@@ -209,7 +212,12 @@ function openMyMenu(pet) {
       btn('🍃', '인생무상', () => { closeMenus(); doAct('sigh'); }),
       btn('🔕', '방해금지', () => { closeMenus(); window.api.setConfig({ dnd: !config.dnd }); }, { on: config.dnd }),
       btn('⚙️', '설정', () => { closeMenus(); window.api.openSettings(); }),
-    ));
+    ),
+    el('div', { class: 'grid one' },
+      btn(config.freeze ? '🏃' : '🧊', config.freeze ? '다시 움직이기' : '그대로 멈춰라', () => {
+        closeMenus(); const v = !config.freeze; window.api.setConfig({ freeze: v });
+        toast(v ? '🧊 그대로 멈춰라! 모두 제자리에 서 있어요' : '🏃 다시 돌아다녀요');
+      }, { on: config.freeze })));
   placePop(pop, pet.x, pet.headTop() - 56);
 }
 
