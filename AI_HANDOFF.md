@@ -1,7 +1,7 @@
-# 피디들 방 (PDRoom) — 다른 AI에게 수정을 맡길 때 처음 붙여 넣는 설명
+# 우가우가 (내부 이름 PDRoom, 예전 이름 피디들 방) — 다른 AI에게 수정을 맡길 때 처음 붙여 넣는 설명
 
 > 이 글을 다른 AI(ChatGPT, Gemini 등)에게 소스 zip과 함께 먼저 붙여 넣어 주세요.
-> 버전: 0.2.1 (2026-11-26)
+> 버전: 0.3.4 (2026-11-27)
 
 ## 1. 이 프로그램은 무엇인가요
 - 친구 4명이 각자 Windows PC에서 켜는 **바탕화면 캐릭터 앱**입니다. 캐릭터(원숭이 monkey, 흰 족제비 ferret, 해달 otter, 사막여우 fennec)가 화면 아래를 걸어 다닙니다.
@@ -37,6 +37,12 @@
 - `notes/{uid}` 받은 쪽지 (닫을 때 지움), `fortune/{uid}` 오늘의 포춘쿠키
 - 새 경로를 추가하면 `firebase-rules.json`도 고치고 Firebase 콘솔에 다시 게시해야 합니다.
 
+## 4-0. 새 버전 내기 (자동 업데이트, 0.3.0부터)
+- 공개 저장소 github.com/gkrud0687-collab/pdroom-update 의 GitHub Actions(`.github/workflows/release.yml`, Windows)가 설치 파일(PDRoom-Setup-x.exe)을 만들어 Releases에 올립니다. 저장소 Secret `BUILD_CONFIG`에 build-config.json 내용이 들어 있어요.
+- 순서: `package.json`의 version 올리기 → main에 push → Actions에서 release 워크플로 실행(Run workflow).
+- 앱은 electron-updater로 15초 뒤·2시간마다 확인 → 받아 두고 "🎁 새 버전" 압정 종이를 띄움(지금 다시 켜기/나중에). 업데이트 후 첫 실행에 "🎉 업데이트됐어요" 1회.
+- **appId(com.pdroom.app), productName(PDRoom), 저장 폴더 이름은 바꾸면 안 됩니다.** 바꾸면 자동 업데이트가 끊기고 캐릭터 선택이 처음부터 다시 나와요. 화면에 보이는 이름(우가우가)만 바꿀 수 있어요.
+
 ## 4. 만들기(빌드) 방법 — Windows PC에서
 1. Node.js(LTS)를 설치합니다.
 2. 소스 폴더에 `build-config.json`을 넣습니다 (따로 보관한 파일).
@@ -50,6 +56,7 @@
 - **그림 규격**: 512×512 투명 PNG. 캐릭터 그림은 발바닥이 y=450에 오게. 캐릭터 그림을 바꾸면 `node scripts/make-manifest.mjs`로 manifest를 다시 만듭니다. 원숭이만 파일 이름 규칙이 다릅니다(예: `monkey_can_hit_01.png`, 다른 캐릭터는 `ferret_hit_can_01.png`).
 - **화면 효과는 단순하게**: 사용자는 효과가 겹치는 걸 싫어합니다. 맞는 물건은 머리에 닿게, 약 1초. 어지러움 표시·화면 번쩍임은 일부러 뺐습니다.
 - **받은 쪽지**는 화면 정가운데에 뜨고 벨처럼 1초 흔들립니다. 닫으면 구겨지며 사라집니다.
+- 확성기(📢)는 모두에게, 쪽지는 친구 캐릭터를 눌러 한 명에게. 이름표는 3분 고정. 마우스·키보드 3분 무활동이면 자리비움. "그대로 멈춰라"는 내 화면만 멈춤(config.freeze).
 - 캐릭터 위치는 PC마다 따로 계산됩니다(서로 같은 자리에 있지 않음).
 - 사용자는 개발자가 아닙니다. 설명은 쉽게, 바꾼 점은 짧게 정리해 주세요.
 
