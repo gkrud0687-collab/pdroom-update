@@ -90,7 +90,7 @@ class Pet {
           this.bagEl.style.width = bw + 'px';
           this.bagEl.style.left = (c.x + back * D * 0.11 - bw / 2) + 'px';
           this.bagEl.style.top = top + 'px';
-          this.bagEl.classList.toggle('flip', back < 0);
+          this.bagEl.classList.toggle('flip', back > 0);   // 옆모습 그림은 오른쪽을 봐요. 업은 친구와 같은 쪽을 보게 뒤집어요
           this.bagEl.classList.toggle('bob', c.anim === 'walk');
         }
         const a0 = this.frames(this.anim); this.ft += dt; const spf0 = 1 / (a0.fps || 2);
@@ -525,8 +525,8 @@ function startPiggy(rider, carrier) {
   // 친구 등의 가방에 쏙 들어가서 얼굴만 내밀어요
   rider.el.classList.add('inbag');
   rider.bagEl = el('div', { class: 'bagride' },
-    el('img', { class: 'bface', src: `assets/props/bagface_${rider.charId}.png`, draggable: 'false' }),
-    el('img', { class: 'bbag', src: 'assets/props/piggy_bag.png', draggable: 'false' }));
+    el('img', { class: 'bface', src: `assets/props/bagside_${rider.charId}.png`, draggable: 'false' }),
+    el('img', { class: 'bbag', src: 'assets/props/piggy_bag_side.png', draggable: 'false' }));
   stage.append(rider.bagEl);
   play('note_arrive', 0.6);
   carrier.carrying = rider;
