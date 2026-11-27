@@ -1,0 +1,567 @@
+{
+  "frameSize": 512,
+  "footY": 450,
+  "displaySize": 160,
+  "characters": [
+    {
+      "id": "monkey",
+      "label": "원숭이",
+      "facing": "right",
+      "face": "characters/monkey/monkey_face_01.png",
+      "card": "characters/monkey/monkey_card_01.png",
+      "anims": {
+        "idle": {
+          "frames": [
+            "characters/monkey/monkey_idle_01.png",
+            "characters/monkey/monkey_idle_02.png",
+            "characters/monkey/monkey_idle_03.png"
+          ],
+          "fps": 2.2,
+          "loop": true
+        },
+        "walk": {
+          "frames": [
+            "characters/monkey/monkey_walk_01.png",
+            "characters/monkey/monkey_walk_02.png",
+            "characters/monkey/monkey_walk_03.png",
+            "characters/monkey/monkey_walk_04.png",
+            "characters/monkey/monkey_walk_05.png",
+            "characters/monkey/monkey_walk_06.png"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "sit": {
+          "frames": [
+            "characters/monkey/monkey_sit_01.png",
+            "characters/monkey/monkey_sit_02.png"
+          ],
+          "fps": 1.5,
+          "loop": true
+        },
+        "rest": {
+          "frames": [
+            "characters/monkey/monkey_sleep_01.png",
+            "characters/monkey/monkey_sleep_02.png"
+          ],
+          "fps": 1,
+          "loop": true
+        },
+        "held": {
+          "frames": [
+            "characters/monkey/monkey_lift_01.png",
+            "characters/monkey/monkey_lift_02.png"
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "hitCan": {
+          "frames": [
+            "characters/monkey/monkey_can_hit_01.png",
+            "characters/monkey/monkey_can_hit_02.png",
+            "characters/monkey/monkey_can_hit_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "hitBolt": {
+          "frames": [
+            "characters/monkey/monkey_lightning_hit_01.png",
+            "characters/monkey/monkey_lightning_hit_02.png",
+            "characters/monkey/monkey_lightning_hit_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "throw": {
+          "frames": [
+            "characters/monkey/monkey_throw_01.png",
+            "characters/monkey/monkey_throw_02.png",
+            "characters/monkey/monkey_throw_03.png"
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "send": {
+          "frames": [
+            "characters/monkey/monkey_note_throw_01.png",
+            "characters/monkey/monkey_note_throw_02.png",
+            "characters/monkey/monkey_note_throw_03.png"
+          ],
+          "fps": 6,
+          "loop": false
+        },
+        "read": {
+          "frames": [
+            "characters/monkey/monkey_note_receive_01.png",
+            "characters/monkey/monkey_note_receive_02.png",
+            "characters/monkey/monkey_note_receive_03.png",
+            "characters/monkey/monkey_note_receive_04.png"
+          ],
+          "fps": 3,
+          "loop": false
+        },
+        "poop": {
+          "frames": [
+            "characters/monkey/monkey_poop_01.png",
+            "characters/monkey/monkey_poop_02.png",
+            "characters/monkey/monkey_poop_03.png",
+            "characters/monkey/monkey_poop_04.png"
+          ],
+          "fps": 2.5,
+          "loop": false
+        },
+        "full": {
+          "frames": [
+            "characters/monkey/monkey_full_01.png",
+            "characters/monkey/monkey_full_02.png",
+            "characters/monkey/monkey_full_03.png"
+          ],
+          "fps": 2,
+          "loop": false
+        },
+        "sigh": {
+          "frames": [
+            "characters/monkey/monkey_sigh_01.png",
+            "characters/monkey/monkey_sigh_02.png",
+            "characters/monkey/monkey_sigh_03.png"
+          ],
+          "fps": 1.6,
+          "loop": false
+        }
+      },
+      "voices": {
+        "default": "sounds/monkey_voice_default.wav",
+        "happy": "sounds/monkey_voice_happy.wav",
+        "hit": "sounds/monkey_voice_hit.wav",
+        "pickup": "sounds/monkey_voice_pickup.wav"
+      },
+      "cardInset": [
+        103,
+        60,
+        49,
+        92
+      ]
+    },
+    {
+      "id": "ferret",
+      "label": "흰 족제비",
+      "facing": "right",
+      "face": "characters/ferret/ferret_face_01.png",
+      "card": "characters/ferret/ferret_select_01.png",
+      "anims": {
+        "idle": {
+          "frames": [
+            "characters/ferret/ferret_idle_01.png",
+            "characters/ferret/ferret_idle_02.png",
+            "characters/ferret/ferret_idle_03.png"
+          ],
+          "fps": 2.2,
+          "loop": true
+        },
+        "walk": {
+          "frames": [
+            "characters/ferret/ferret_walk_01.png",
+            "characters/ferret/ferret_walk_02.png",
+            "characters/ferret/ferret_walk_03.png",
+            "characters/ferret/ferret_walk_04.png",
+            "characters/ferret/ferret_walk_05.png",
+            "characters/ferret/ferret_walk_06.png"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "sit": {
+          "frames": [
+            "characters/ferret/ferret_sit_01.png",
+            "characters/ferret/ferret_sit_02.png"
+          ],
+          "fps": 1.5,
+          "loop": true
+        },
+        "rest": {
+          "frames": [
+            "characters/ferret/ferret_rest_01.png",
+            "characters/ferret/ferret_rest_02.png"
+          ],
+          "fps": 1,
+          "loop": true
+        },
+        "held": {
+          "frames": [
+            "characters/ferret/ferret_held_01.png",
+            "characters/ferret/ferret_held_02.png"
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "hitCan": {
+          "frames": [
+            "characters/ferret/ferret_hit_can_01.png",
+            "characters/ferret/ferret_hit_can_02.png",
+            "characters/ferret/ferret_hit_can_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "hitBolt": {
+          "frames": [
+            "characters/ferret/ferret_hit_bolt_01.png",
+            "characters/ferret/ferret_hit_bolt_02.png",
+            "characters/ferret/ferret_hit_bolt_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "throw": {
+          "frames": [
+            "characters/ferret/ferret_throw_01.png",
+            "characters/ferret/ferret_throw_02.png",
+            "characters/ferret/ferret_throw_03.png"
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "send": {
+          "frames": [
+            "characters/ferret/ferret_send_01.png",
+            "characters/ferret/ferret_send_02.png",
+            "characters/ferret/ferret_send_03.png"
+          ],
+          "fps": 6,
+          "loop": false
+        },
+        "read": {
+          "frames": [
+            "characters/ferret/ferret_read_01.png",
+            "characters/ferret/ferret_read_02.png",
+            "characters/ferret/ferret_read_03.png",
+            "characters/ferret/ferret_read_04.png"
+          ],
+          "fps": 3,
+          "loop": false
+        },
+        "poop": {
+          "frames": [
+            "characters/ferret/ferret_poop_01.png",
+            "characters/ferret/ferret_poop_02.png",
+            "characters/ferret/ferret_poop_03.png",
+            "characters/ferret/ferret_poop_04.png"
+          ],
+          "fps": 2.5,
+          "loop": false
+        },
+        "full": {
+          "frames": [
+            "characters/ferret/ferret_full_01.png",
+            "characters/ferret/ferret_full_02.png",
+            "characters/ferret/ferret_full_03.png"
+          ],
+          "fps": 2,
+          "loop": false
+        },
+        "sigh": {
+          "frames": [
+            "characters/ferret/ferret_sigh_01.png",
+            "characters/ferret/ferret_sigh_02.png",
+            "characters/ferret/ferret_sigh_03.png"
+          ],
+          "fps": 1.6,
+          "loop": false
+        }
+      },
+      "voices": {
+        "default": "sounds/ferret_voice_default.wav",
+        "happy": "sounds/ferret_voice_happy.wav",
+        "hit": "sounds/ferret_voice_hit.wav",
+        "pickup": "sounds/ferret_voice_pickup.wav"
+      },
+      "cardInset": [
+        103,
+        60,
+        49,
+        92
+      ]
+    },
+    {
+      "id": "otter",
+      "label": "해달",
+      "facing": "right",
+      "face": "characters/otter/otter_face_01.png",
+      "card": "characters/otter/otter_select_01.png",
+      "anims": {
+        "idle": {
+          "frames": [
+            "characters/otter/otter_idle_01.png",
+            "characters/otter/otter_idle_02.png",
+            "characters/otter/otter_idle_03.png"
+          ],
+          "fps": 2.2,
+          "loop": true
+        },
+        "walk": {
+          "frames": [
+            "characters/otter/otter_walk_01.png",
+            "characters/otter/otter_walk_02.png",
+            "characters/otter/otter_walk_03.png",
+            "characters/otter/otter_walk_04.png",
+            "characters/otter/otter_walk_05.png",
+            "characters/otter/otter_walk_06.png"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "sit": {
+          "frames": [
+            "characters/otter/otter_sit_01.png",
+            "characters/otter/otter_sit_02.png"
+          ],
+          "fps": 1.5,
+          "loop": true
+        },
+        "rest": {
+          "frames": [
+            "characters/otter/otter_rest_01.png",
+            "characters/otter/otter_rest_02.png"
+          ],
+          "fps": 1,
+          "loop": true
+        },
+        "held": {
+          "frames": [
+            "characters/otter/otter_held_01.png",
+            "characters/otter/otter_held_02.png"
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "hitCan": {
+          "frames": [
+            "characters/otter/otter_hit_can_01.png",
+            "characters/otter/otter_hit_can_02.png",
+            "characters/otter/otter_hit_can_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "hitBolt": {
+          "frames": [
+            "characters/otter/otter_hit_bolt_01.png",
+            "characters/otter/otter_hit_bolt_02.png",
+            "characters/otter/otter_hit_bolt_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "throw": {
+          "frames": [
+            "characters/otter/otter_throw_01.png",
+            "characters/otter/otter_throw_02.png",
+            "characters/otter/otter_throw_03.png"
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "send": {
+          "frames": [
+            "characters/otter/otter_send_01.png",
+            "characters/otter/otter_send_02.png",
+            "characters/otter/otter_send_03.png"
+          ],
+          "fps": 6,
+          "loop": false
+        },
+        "read": {
+          "frames": [
+            "characters/otter/otter_read_01.png",
+            "characters/otter/otter_read_02.png",
+            "characters/otter/otter_read_03.png",
+            "characters/otter/otter_read_04.png"
+          ],
+          "fps": 3,
+          "loop": false
+        },
+        "poop": {
+          "frames": [
+            "characters/otter/otter_poop_01.png",
+            "characters/otter/otter_poop_02.png",
+            "characters/otter/otter_poop_03.png",
+            "characters/otter/otter_poop_04.png"
+          ],
+          "fps": 2.5,
+          "loop": false
+        },
+        "full": {
+          "frames": [
+            "characters/otter/otter_full_01.png",
+            "characters/otter/otter_full_02.png",
+            "characters/otter/otter_full_03.png"
+          ],
+          "fps": 2,
+          "loop": false
+        },
+        "sigh": {
+          "frames": [
+            "characters/otter/otter_sigh_01.png",
+            "characters/otter/otter_sigh_02.png",
+            "characters/otter/otter_sigh_03.png"
+          ],
+          "fps": 1.6,
+          "loop": false
+        }
+      },
+      "voices": {
+        "default": "sounds/otter_voice_default.wav",
+        "happy": "sounds/otter_voice_happy.wav",
+        "hit": "sounds/otter_voice_hit.wav",
+        "pickup": "sounds/otter_voice_pickup.wav"
+      },
+      "cardInset": [
+        103,
+        60,
+        49,
+        92
+      ]
+    },
+    {
+      "id": "fennec",
+      "label": "사막여우",
+      "facing": "right",
+      "face": "characters/fennec/fennec_face_01.png",
+      "card": "characters/fennec/fennec_select_01.png",
+      "anims": {
+        "idle": {
+          "frames": [
+            "characters/fennec/fennec_idle_01.png",
+            "characters/fennec/fennec_idle_02.png",
+            "characters/fennec/fennec_idle_03.png"
+          ],
+          "fps": 2.2,
+          "loop": true
+        },
+        "walk": {
+          "frames": [
+            "characters/fennec/fennec_walk_01.png",
+            "characters/fennec/fennec_walk_02.png",
+            "characters/fennec/fennec_walk_03.png",
+            "characters/fennec/fennec_walk_04.png",
+            "characters/fennec/fennec_walk_05.png",
+            "characters/fennec/fennec_walk_06.png"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "sit": {
+          "frames": [
+            "characters/fennec/fennec_sit_01.png",
+            "characters/fennec/fennec_sit_02.png"
+          ],
+          "fps": 1.5,
+          "loop": true
+        },
+        "rest": {
+          "frames": [
+            "characters/fennec/fennec_rest_01.png",
+            "characters/fennec/fennec_rest_02.png"
+          ],
+          "fps": 1,
+          "loop": true
+        },
+        "held": {
+          "frames": [
+            "characters/fennec/fennec_held_01.png",
+            "characters/fennec/fennec_held_02.png"
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "hitCan": {
+          "frames": [
+            "characters/fennec/fennec_hit_can_01.png",
+            "characters/fennec/fennec_hit_can_02.png",
+            "characters/fennec/fennec_hit_can_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "hitBolt": {
+          "frames": [
+            "characters/fennec/fennec_hit_bolt_01.png",
+            "characters/fennec/fennec_hit_bolt_02.png",
+            "characters/fennec/fennec_hit_bolt_03.png"
+          ],
+          "fps": 5,
+          "loop": false
+        },
+        "throw": {
+          "frames": [
+            "characters/fennec/fennec_throw_01.png",
+            "characters/fennec/fennec_throw_02.png",
+            "characters/fennec/fennec_throw_03.png"
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "send": {
+          "frames": [
+            "characters/fennec/fennec_send_01.png",
+            "characters/fennec/fennec_send_02.png",
+            "characters/fennec/fennec_send_03.png"
+          ],
+          "fps": 6,
+          "loop": false
+        },
+        "read": {
+          "frames": [
+            "characters/fennec/fennec_read_01.png",
+            "characters/fennec/fennec_read_02.png",
+            "characters/fennec/fennec_read_03.png",
+            "characters/fennec/fennec_read_04.png"
+          ],
+          "fps": 3,
+          "loop": false
+        },
+        "poop": {
+          "frames": [
+            "characters/fennec/fennec_poop_01.png",
+            "characters/fennec/fennec_poop_02.png",
+            "characters/fennec/fennec_poop_03.png",
+            "characters/fennec/fennec_poop_04.png"
+          ],
+          "fps": 2.5,
+          "loop": false
+        },
+        "full": {
+          "frames": [
+            "characters/fennec/fennec_full_01.png",
+            "characters/fennec/fennec_full_02.png",
+            "characters/fennec/fennec_full_03.png"
+          ],
+          "fps": 2,
+          "loop": false
+        },
+        "sigh": {
+          "frames": [
+            "characters/fennec/fennec_sigh_01.png",
+            "characters/fennec/fennec_sigh_02.png",
+            "characters/fennec/fennec_sigh_03.png"
+          ],
+          "fps": 1.6,
+          "loop": false
+        }
+      },
+      "voices": {
+        "default": "sounds/fennec_voice_default.wav",
+        "happy": "sounds/fennec_voice_happy.wav",
+        "hit": "sounds/fennec_voice_hit.wav",
+        "pickup": "sounds/fennec_voice_pickup.wav"
+      },
+      "cardInset": [
+        103,
+        60,
+        49,
+        92
+      ]
+    }
+  ]
+}

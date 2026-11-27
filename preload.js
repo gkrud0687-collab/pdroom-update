@@ -1,0 +1,24 @@
+// 렌더러(화면)가 메인 프로세스와 이야기하는 통로예요.
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', {
+  getConfig: () => ipcRenderer.invoke('config:get'),
+  setConfig: (patch) => ipcRenderer.invoke('config:set', patch),
+  onConfig: (fn) => ipcRenderer.on('config:changed', (_e, c) => fn(c)),
+  getFirebase: () => ipcRenderer.invoke('firebase:get'),
+  saveFirebase: (cfg) => ipcRenderer.invoke('firebase:save', cfg),
+  getAutoLaunch: () => ipcRenderer.invoke('autolaunch:get'),
+  setAutoLaunch: (on) => ipcRenderer.invoke('autolaunch:set', on),
+  screenInfo: () => ipcRenderer.invoke('screen:info'),
+  setIgnore: (v) => ipcRenderer.send('pet:ignore', v),
+  focusPet: () => ipcRenderer.send('pet:focus'),
+  close: () => ipcRenderer.send('win:close'),
+  minimize: () => ipcRenderer.send('win:minimize'),
+  openSettings: () => ipcRenderer.send('settings:open'),
+  quit: () => ipcRenderer.send('app:quit'),
+  setupDone: (data) => ipcRenderer.send('setup:done', data),
+  restartSetup: () => ipcRenderer.send('setup:restart'),
+  log: (msg) => ipcRenderer.send('app:log', String(msg).slice(0, 2000)),
+  onLeaving: (fn) => ipcRenderer.on('app:leaving', () => fn()),
+  onIdle: (fn) => ipcRenderer.on('idle:changed', (_e, v) => fn(v)),
+  onUpdateReady: (fn) => ipcRenderer.on('update:ready', (_e, v) => fn(v)),
+});

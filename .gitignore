@@ -1,0 +1,7 @@
+node_modules/
+release/
+dist/
+src/gen/
+*.log
+build-config.json
+firebase-config.json

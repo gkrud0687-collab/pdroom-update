@@ -1,0 +1,79 @@
+{
+  "name": "pd-room",
+  "version": "0.3.0",
+  "description": "친구 4명이 함께 쓰는 바탕화면 캐릭터 방",
+  "main": "main.js",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/build.mjs && electron .",
+    "dist": "node scripts/check-config.mjs && node scripts/build.mjs --min && electron-builder --win nsis --x64 --publish never",
+    "dist:zip": "node scripts/check-config.mjs && node scripts/build.mjs --min && electron-builder --win zip --x64 --publish never",
+    "dist:publish": "node scripts/check-config.mjs && node scripts/build.mjs --min && electron-builder --win nsis --x64 --publish always"
+  },
+  "author": "pd-room",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^38.8.6",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "firebase": "^11.10.0",
+    "pe-library": "^2.0.3",
+    "resedit": "^3.1.1"
+  },
+  "productName": "PDRoom",
+  "build": {
+    "appId": "com.pdroom.app",
+    "productName": "PDRoom",
+    "executableName": "PDRoom",
+    "artifactName": "PDRoom-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "*.html",
+      "style.css",
+      "dist/**/*.js",
+      "assets/manifest.json",
+      "assets/characters/**",
+      "assets/props/**",
+      "assets/sounds/**",
+      "package.json",
+      "!**/*.map",
+      "build-config.json",
+      "assets/app_icon.png"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "signAndEditExecutable": false,
+      "icon": "build/icon.ico"
+    },
+    "asar": true,
+    "afterPack": "scripts/after-pack.cjs",
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "피디들 방",
+      "artifactName": "PDRoom-Setup-${version}.${ext}",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "gkrud0687-collab",
+        "repo": "pdroom-update",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  }
+}

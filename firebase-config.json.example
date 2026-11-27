@@ -1,0 +1,9 @@
+{
+  "apiKey": "여기에 apiKey",
+  "authDomain": "여기에 authDomain",
+  "databaseURL": "여기에 databaseURL (https://...firebaseio.com 또는 ...firebasedatabase.app)",
+  "projectId": "여기에 projectId",
+  "storageBucket": "",
+  "messagingSenderId": "",
+  "appId": "여기에 appId"
+}

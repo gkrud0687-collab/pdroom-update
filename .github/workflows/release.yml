@@ -1,0 +1,29 @@
+# 새 버전 만들기: package.json 의 version 을 올리고 "v<버전>" 태그를 push 하면
+# Windows 컴퓨터(GitHub Actions)에서 설치 파일을 만들어 Releases 에 올려요.
+# 친구들 앱은 이 Releases 를 보고 자동으로 업데이트해요.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: build-config.json 만들기 (저장소 Secret BUILD_CONFIG 에서)
+        shell: bash
+        env:
+          BUILD_CONFIG: ${{ secrets.BUILD_CONFIG }}
+        run: |
+          if [ -z "$BUILD_CONFIG" ]; then echo "Secret BUILD_CONFIG 가 없어요"; exit 1; fi
+          printf '%s' "$BUILD_CONFIG" > build-config.json
+      - run: npm run dist:publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

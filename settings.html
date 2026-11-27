@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app; frame-src https://*.firebaseio.com https://*.firebasedatabase.app; connect-src 'self' https: wss: http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:*; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>피디들 방 설정</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .body { flex: 1; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .sec { background: #fff; border: 2px solid var(--lav-l); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .sec h3 { margin: 0; font-size: 13px; color: var(--lav-d); }
+  .me { display: flex; gap: 10px; align-items: center; }
+  .me img { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--lav-l); }
+  .me b { font-size: 16px; }
+  .opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .sw { position: relative; width: 44px; height: 24px; flex: none; }
+  .sw input { display: none; }
+  .sw span { position: absolute; inset: 0; background: #ddd6ee; border-radius: 999px; transition: .15s; cursor: pointer; }
+  .sw span::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .sw input:checked + span { background: var(--lav-d); }
+  .sw input:checked + span::after { left: 23px; }
+  input[type=range] { accent-color: var(--lav-d); padding: 0; border: none; }
+  .code { font-weight: 900; letter-spacing: 4px; font-size: 18px; color: var(--lav-dd); }
+  .ok { color: var(--ok); font-size: 13px; min-height: 18px; }
+  .danger { background: #fde8ec; color: var(--red); }
+  .danger:hover { background: #fbd5dc; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="titlebar">⚙️ 설정 <span class="sp"></span><button id="close" title="닫기">✕</button></div>
+  <div class="body" id="body"></div>
+</div>
+<script src="dist/settings.js"></script>
+</body>
+</html>

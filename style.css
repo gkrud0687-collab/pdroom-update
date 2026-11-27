@@ -1,0 +1,50 @@
+/* 피디들 방 공통 스타일 — 연보라 톤 */
+:root {
+  --lav: #b9a7ec;
+  --lav-d: #7b63cf;
+  --lav-dd: #4f3b9a;
+  --lav-l: #efeafd;
+  --lav-ll: #f8f5ff;
+  --paper: #fffdf6;
+  --ink: #3a3350;
+  --ink-2: #6f6888;
+  --red: #e2566b;
+  --ok: #4caf88;
+  --shadow: 0 6px 20px rgba(79, 59, 154, 0.22);
+  --radius: 16px;
+  font-family: 'Pretendard', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: transparent; user-select: none; -webkit-user-select: none; font-size: 14px; }
+button {
+  font: inherit; cursor: pointer; border: none; border-radius: 12px;
+  background: var(--lav-l); color: var(--lav-dd); padding: 8px 14px; font-weight: 600;
+  transition: transform .08s, background .15s;
+}
+button:hover { background: #e2d9fb; }
+button:active { transform: scale(.96); }
+button.primary { background: var(--lav-d); color: #fff; }
+button.primary:hover { background: #6a52bf; }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+input, textarea {
+  font: inherit; color: var(--ink); border: 2px solid var(--lav-l); border-radius: 12px;
+  padding: 8px 10px; outline: none; background: #fff; width: 100%;
+  user-select: text; -webkit-user-select: text;
+}
+input:focus, textarea:focus { border-color: var(--lav); }
+.frame {
+  position: fixed; inset: 6px; background: var(--lav-ll); border: 3px solid var(--lav);
+  border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
+}
+.titlebar {
+  -webkit-app-region: drag; display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: var(--lav); color: #fff; font-weight: 800; font-size: 15px;
+}
+.titlebar .sp { flex: 1; }
+.titlebar button { -webkit-app-region: no-drag; background: rgba(255,255,255,.25); color: #fff; padding: 2px 10px; border-radius: 10px; }
+.titlebar button:hover { background: rgba(255,255,255,.4); }
+.muted { color: var(--ink-2); font-size: 12.5px; }
+.err { color: var(--red); font-size: 13px; min-height: 18px; }
+.row { display: flex; gap: 8px; align-items: center; }
