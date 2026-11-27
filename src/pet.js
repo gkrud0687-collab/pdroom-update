@@ -79,6 +79,16 @@ class Pet {
     }
   }
   update(dt, now) {
+    if (this.rideOn) {
+      const c = this.rideOn;
+      if (now >= this.rideUntil || !pets.has(c.uid) || c.held || c.hidden) endPiggy(this);
+      else {
+        this.dir = c.dir; this.x = c.x - c.dir * c.facing * D * 0.06; this.y = c.y + D * 0.26; this.set('sit');
+        const a0 = this.frames(this.anim); this.ft += dt; const spf0 = 1 / (a0.fps || 2);
+        while (this.ft >= spf0) { this.ft -= spf0; if (a0.loop || this.frame < a0.frames.length - 1) this.frame = (this.frame + 1) % a0.frames.length; }
+        return;
+      }
+    }
     if (this.held) { this.set('held'); }
     else if (this.falling) {
       this.vy -= GRAVITY * dt; this.y += this.vy * dt;
@@ -93,7 +103,7 @@ class Pet {
     } else if (this.targetX != null) {
       const d = this.targetX - this.x;
       this.dir = d >= 0 ? 1 : -1;
-      const step = WALK_SPEED * dt;
+      const step = WALK_SPEED * dt * (this.carrying ? 0.55 : 1);
       if (Math.abs(d) <= step) { this.x = this.targetX; this.targetX = null; this.decide(now); }
       else this.x += step * this.dir;
     } else if (now >= this.nextDecide) this.decide(now);
@@ -109,7 +119,7 @@ class Pet {
   render(hiddenAll) {
     const hide = hiddenAll || this.hidden;
     this.el.classList.toggle('gone', hide);
-    this.tag.style.display = hide ? 'none' : '';
+    this.tag.style.display = hide || this.carrying ? 'none' : '';   // 업고 있을 땐 이름표가 등에 탄 친구를 가려서 숨겨요
     if (this.bubble) this.bubble.style.display = hide ? 'none' : '';
     if (hide) return;
     const a = this.frames(this.anim);
@@ -238,12 +248,13 @@ function openFriendMenu(pet) {
       btn('🎈', '물풍선', () => { closeMenus(); requestThrow(pet.uid, 'balloon'); }, { disabled: dnd }),
     ),
     el('div', { class: 'gl', text: '장난' }),
-    el('div', { class: 'grid', style: { gridTemplateColumns: 'repeat(5, 52px)' } },
+    el('div', { class: 'grid', style: { gridTemplateColumns: 'repeat(3, 1fr)' } },
       btn('🔨', '뿅망치', () => { closeMenus(); requestPrank(pet.uid, 'hammer'); }, { disabled: dnd }),
       btn('👉', '콕', () => { closeMenus(); requestPrank(pet.uid, 'poke'); }, { disabled: dnd }),
       btn('🪶', '간지럼', () => { closeMenus(); requestPrank(pet.uid, 'tickle'); }, { disabled: dnd }),
       btn('🍌', '바나나', () => { closeMenus(); requestBanana(pet.uid); }, { disabled: dnd }),
       btn('🏷️', '이름표', () => { closeMenus(); openNameTag(pet); }, { disabled: dnd }),
+      btn('🐨', '업히기', () => { closeMenus(); requestPrank(pet.uid, 'piggy'); }, { disabled: dnd }),
     ),
     el('div', { class: 'grid one' }, btn('✉️', '쪽지', () => { closeMenus(); openCompose(pet.uid); })),
     dnd ? el('div', { class: 'note', text: '🔕 방해금지 중이에요. 쪽지는 끝나면 도착해요.' }) : null);
@@ -420,14 +431,14 @@ function megaArrived(id, data) {
     bar.replaceChildren(el('span', { class: 'mlbl', text: '✏️ 답장 쓰는 중' }), cancel, send);
     const back = (doneText) => {
       writing = false; sheet.replaceChildren(...[re, txt].filter(Boolean));
-      bar.replaceChildren(doneText ? el('span', { class: 'mlbl sent', text: `${doneText} · 클릭하면 닫혀요` }) : lbl, ...(doneText ? [] : [replyBtn]));
+      bar.replaceChildren(doneText ? el('span', { class: 'mlbl sent', text: doneText }) : lbl, ...(doneText ? [] : [replyBtn]));
     };
     cancel.onclick = () => back(null);
     send.onclick = async () => {
       const text = ta.value.trim().slice(0, LIMITS.NOTE_MAX);
       if (!text) { ta.focus(); return; }
       send.disabled = true;
-      if (await sendMega(text, data.text)) back('모두에게 답장했어요 ✓'); else send.disabled = false;
+      if (await sendMega(text, data.text)) { back('모두에게 답장했어요 ✓'); writing = true; closeAfterReply(wrap, n); } else send.disabled = false;
     };
     window.api.focusPet(); setTimeout(() => ta.focus(), 50);
   };
@@ -488,7 +499,36 @@ function animatePrank(fromUid, toUid, kind) {
     voice(pet.charId, 'happy', 0.8);
     pet.say('히히힛 간지러워!', 1800);
     prankToast(fromUid, toUid, '간지럽혔어요! 🪶');
+  } else if (kind === 'piggy') {
+    const rider = pets.get(fromUid);
+    if (!rider || rider.hidden || rider === pet) return;
+    startPiggy(rider, pet);
+    prankToast(fromUid, toUid, '등에 업혔어요! 🐨');
   }
+}
+// 업히기: 장난 건 캐릭터가 친구 등에 올라타서 6초 동안 같이 다녀요
+const PIGGY_MS = 6000;
+function startPiggy(rider, carrier) {
+  if (rider.rideOn) return;
+  voice(rider.charId, 'happy', 0.8);
+  rider.held = false; rider.falling = false; rider.until = 0; rider.targetX = null;
+  rider.rideOn = carrier; rider.rideUntil = performance.now() + PIGGY_MS;
+  rider.el.classList.add('riding');
+  carrier.carrying = rider;
+  carrier.say('끙차… 무거워!', 2200);
+  voice(carrier.charId, 'sigh', 0.7);
+  // 업은 친구는 천천히 몇 걸음 걸어요
+  carrier.until = 0; carrier.held = false;
+  const dx = (carrier.x > W / 2 ? -1 : 1) * (120 + Math.random() * 80);
+  carrier.targetX = Math.max(D / 2, Math.min(W - D / 2, carrier.x + dx)); carrier.set('walk'); carrier.nextDecide = Infinity;
+}
+function endPiggy(rider) {
+  const carrier = rider.rideOn;
+  rider.rideOn = null; rider.el.classList.remove('riding');
+  if (carrier) carrier.carrying = null;
+  rider.x = Math.max(D / 2, Math.min(W - D / 2, rider.x + (carrier ? -carrier.dir * 40 : 0)));
+  rider.falling = true; rider.vy = 260; rider.set('held');
+  rider.say('히히 재밌다!', 1500);
 }
 function balloonHit(pet, fromUid) {
   const c = hitPoint(pet, 'can');
@@ -795,12 +835,21 @@ function openNote(n) {
         box.remove();
         ft.prepend(el('span', { class: 'sent', text: '답장을 보냈어요 ✓' }));
         recenter(card);
+        closeAfterReply(card, n);
       } else send.disabled = false;
     };
   };
   closeBtn.onclick = () => crumple(card, n);
 }
 // 닫으면 쪽지가 구겨지며 사라져요
+// 답장을 보낸 쪽지·확성기는 살짝 사라지며 닫혀요 (구겨지지 않아요)
+function closeAfterReply(card, n, delay = 900) {
+  setTimeout(() => {
+    card.classList.add('fadeaway');
+    setTimeout(() => { card.remove(); openPops = openPops.filter((p) => p !== card); }, 450);
+    if (n) { notes.delete(n.id); remove(R(room, 'notes', myUid, n.id)).catch(() => {}); }
+  }, delay);
+}
 function crumple(card, n) {
   const r = card.getBoundingClientRect();
   const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -1126,4 +1175,4 @@ window.api.onLeaving(async () => { leaving = true; await stopPresence(); });
 main().catch((e) => { console.error(e); toast(friendlyError(e), null, 20000); });
 
 // 개발용 훅 (화면 점검)
-window.__pdroom = { showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
+window.__pdroom = { startPiggy, showUpdateReady, showUpdatedOnce, setAway: (v) => { myAway = !!v; if (myConn) update(myConn, { away: myAway }).catch(() => {}); syncPets(); }, pets, notes, openMegaphone, requestThrow, requestPrank, requestBanana, setNameTag, nameTags, bananas, doAct, openFortune, openCompose, noteArrived, openNote, crumple, openMyMenu, openFriendMenu, sendNote, get members() { return members; } };
