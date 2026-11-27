@@ -10,6 +10,8 @@ if (process.env.PDROOM_PROFILE) {
   app.setPath('userData', path.join(app.getPath('appData'), 'pd-room-' + process.env.PDROOM_PROFILE));
 }
 if (!app.requestSingleInstanceLock()) { app.quit(); process.exit(0); }
+// 작업표시줄 메뉴의 '우가우가 끄기'는 --quit 으로 실행돼요. 켜져 있는 앱이 없으면 그냥 끝내요.
+if (process.argv.includes('--quit')) { app.quit(); process.exit(0); }
 
 const CONFIG_PATH = () => path.join(app.getPath('userData'), 'config.json');
 let config = {};
@@ -224,7 +226,10 @@ function snapIfAsked(win, name) {
   });
 }
 
-app.on('second-instance', () => { if (setupWin) setupWin.focus(); else createSettings(); });
+app.on('second-instance', (_e, argv) => {
+  if ((argv || []).includes('--quit')) { quitApp(); return; }
+  if (setupWin) setupWin.focus(); else createSettings();
+});
 app.on('window-all-closed', () => { if (quitting || (!petWin && !setupWin)) app.quit(); });
 
 // ---------- 자동 업데이트 (설치 파일로 깐 경우만) ----------
@@ -248,6 +253,13 @@ function startAutoUpdate() {
 }
 
 app.whenReady().then(() => {
+  // 작업표시줄 아이콘 오른쪽 클릭 메뉴에 '우가우가 끄기'를 넣어요
+  if (process.platform === 'win32' && app.isPackaged) {
+    try {
+      app.setUserTasks([{ program: process.execPath, arguments: '--quit', iconPath: process.execPath, iconIndex: 0,
+        title: '우가우가 끄기', description: '우가우가를 완전히 꺼요' }]);
+    } catch { /* 무시 */ }
+  }
   loadConfig();
   const fixedRoom = loadBuildConfig().room;
   if (fixedRoom && config.room !== fixedRoom) { config.room = fixedRoom; config.uid = null; config.char = null; saveConfig(); }
